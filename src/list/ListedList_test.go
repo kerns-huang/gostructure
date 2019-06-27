@@ -28,12 +28,17 @@ func TestAdd(t *testing.T) {
 func TestRemoveAt(t *testing.T){
 
 	list.RemoveAt(1)
-	print(list.size)
 	if list.size!=2{
 		t.Errorf("can not remove null list")
 	}
 }
 
+func TestContains(t *testing.T){
+	result :=list.contains(1,3)
+	if !result{
+		t.Error("contains method is error")
+	}
+}
 
 func TestToString(t *testing.T) {
 	list.toString()
