@@ -56,7 +56,6 @@ func (list *LinkedList) add(node *Node) {
 func (list *LinkedList) RemoveAt(i int) (*Item, error) {
 	list.lock.Lock()
 	defer list.lock.Unlock()
-
 	if i < 0 || i > list.size {
 		return nil, fmt.Errorf("Index %d out of bonuds", i)
 	}

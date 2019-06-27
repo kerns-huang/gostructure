@@ -23,3 +23,8 @@ func TestAdd(t *testing.T) {
 		t.Errorf("Wrong count, expected 3 but got %d", size)
 	}
 }
+
+
+func TestRemoveAt(t *testing.T){
+
+}
