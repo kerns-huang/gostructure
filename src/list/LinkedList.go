@@ -71,3 +71,14 @@ func (list *LinkedList) RemoveAt(i int) (*Item, error) {
 	list.size--
 	return &item, nil
 }
+
+func (list *LinkedList) toString(){
+	curNode := list.first
+	for{
+		if curNode.next ==nil{
+			break
+		}
+		println(curNode.data)
+		curNode=curNode.next
+	}
+}
