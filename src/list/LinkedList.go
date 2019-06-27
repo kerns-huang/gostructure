@@ -44,6 +44,7 @@ func (list *LinkedList) add(node *Node) {
 	if (*list).size == 0 {
 		(*list).first = node //如果没有元素，跟节点赋值
 		(*list).last = node
+		(*list).size=1
 	} else {
 		(*list).last.next = node
 		node.pre = (*list).last

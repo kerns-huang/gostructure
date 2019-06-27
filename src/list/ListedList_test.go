@@ -6,7 +6,7 @@ import "testing"
 
 var list LinkedList
 
-func TestAppend(t *testing.T) {
+func TestAdd(t *testing.T) {
 	if !list.isEmpty() {
 		t.Errorf("Linked list should be empty")
 	}
@@ -17,7 +17,6 @@ func TestAppend(t *testing.T) {
 	if size := list.getSize(); size != 1 {
 		t.Errorf("Wrong count, expected 1 but got %d", size)
 	}
-
 	list.addObj(2)
 	list.addObj(3)
 	if size := list.getSize(); size != 3 {
