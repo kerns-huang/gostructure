@@ -19,39 +19,31 @@ type LinkedList struct {
 	first *Node        //跟节点
 	lock  sync.RWMutex //读写锁对象
 }
+//新生成一个LinkedList
+func NewLinkedList() *LinkedList{
+	list :=new(LinkedList)
+	list.Init()
+	return list
+}
 
 func (list *LinkedList) Init() {
 	(*list).size = 0
 	(list).first = nil
 }
 
-func (list *LinkedList) addObj(t Item) {
+func (list *LinkedList) Add(t Item) {
 	node := &Node{nil, t, nil}
 	(*list).add(node)
 }
 
-func (list *LinkedList) isEmpty() bool {
+func (list *LinkedList) Empty() bool {
 	return (*list).size == 0
 }
 
-func (list *LinkedList) getSize() int {
+func (list *LinkedList) Size() int {
 	return (*list).size
 }
 
-func (list *LinkedList) add(node *Node) {
-	list.lock.Lock()
-	defer list.lock.Unlock()
-	if (*list).size == 0 {
-		(*list).first = node //如果没有元素，跟节点赋值
-		(*list).last = node
-		(*list).size = 1
-	} else {
-		(*list).last.next = node
-		node.pre = (*list).last
-		(*list).last = node;
-		(*list).size++
-	}
-}
 
 func (list *LinkedList) RemoveAt(i int) (*Item, error) {
 	list.lock.Lock()
@@ -80,7 +72,7 @@ func (list *LinkedList) RemoveAt(i int) (*Item, error) {
 	return &item, nil
 }
 
-func (list *LinkedList) contains(vals ...Item) bool {
+func (list *LinkedList) Contains(vals ...Item) bool {
 	ss := 0
 	for _, v := range vals {
 		curNode := list.first
@@ -98,7 +90,7 @@ func (list *LinkedList) contains(vals ...Item) bool {
 	return ss == len(vals)
 }
 
-func (list *LinkedList) toString() {
+func (list *LinkedList) ToString() {
 	curNode := list.first
 	for {
 		if curNode != nil {
@@ -108,5 +100,21 @@ func (list *LinkedList) toString() {
 			break
 		}
 		curNode = curNode.next
+	}
+}
+
+
+func (list *LinkedList) add(node *Node) {
+	list.lock.Lock()
+	defer list.lock.Unlock()
+	if (*list).size == 0 {
+		(*list).first = node //如果没有元素，跟节点赋值
+		(*list).last = node
+		(*list).size = 1
+	} else {
+		(*list).last.next = node
+		node.pre = (*list).last
+		(*list).last = node;
+		(*list).size++
 	}
 }
