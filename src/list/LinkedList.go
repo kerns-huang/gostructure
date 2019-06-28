@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-type Item int
 
 type Node struct {
 	pre  *Node
