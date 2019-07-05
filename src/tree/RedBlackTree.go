@@ -45,14 +45,21 @@ func (tree *BRTree) Add(item Item) {
 	*
 	*
 	*/
-func (node *RBTreeNode) rotateLeft() (*RBTreeNode, error) {
+func (x *RBTreeNode) rotateLeft() (*RBTreeNode, error) {
 	var root *RBTreeNode
-	rnode := node.right
-	grandson := node.right.left //爷爷节点
-	node.right.left = node
-	node.parent = node.right
-	node.right = grandson
-	grandson.left=rnode
+	y := x.right //新对象引用
+	if y.left != nil {
+		y.left.parent = x
+	}
+	if x.parent != nil {
+		root = y
+	} else {
+		y.parent = x.parent
+		x.parent.left = y
+	}
+	y.left = x
+	x.parent = y
+	x.right = y.left
 	return root, nil
 
 }
@@ -71,20 +78,34 @@ func (node *RBTreeNode) rotateLeft() (*RBTreeNode, error) {
 	*
 	*/
 // 右旋操作，当前节点成为右节点
-func (tree *BRTree) rotateRight(node RBTreeNode) {
+func (y *RBTreeNode) rotateRight() (*RBTreeNode, error) {
+	var root *RBTreeNode
+	x := y.left
+	if y.parent == nil {
+		root = x
+	} else {
+		x.parent = y.parent
+		y.parent.left = x
+	}
+	x.right = y
+	y.parent = x
+	if x.right != nil {
+		y.left = x.right
+		x.right.parent = y
+	}
+	return root, nil
 
 }
 
-   /*
-	* 红黑树插入修正函数
-	*
-	* 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
-	* 目的是将它重新塑造成一颗红黑树。
-	*
-	* 参数说明：
-	*     node 插入的结点
-	*/
+/*
+ * 红黑树插入修正函数
+ *
+ * 在向红黑树中插入节点之后(失去平衡)，再调用该函数；
+ * 目的是将它重新塑造成一颗红黑树。
+ *
+ * 参数说明：
+ *     node 插入的结点
+ */
 func insertFixUp(node RBTreeNode) {
-
 
 }
