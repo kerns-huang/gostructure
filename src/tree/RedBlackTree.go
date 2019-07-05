@@ -46,6 +46,9 @@ func (tree *RBTree) Add(item Item) {
 	*
 	*/
 func (tree *RBTree) rotateLeft(x *RBTreeNode)  {
+	if x.right == nil{
+		return
+	}
 	y := x.right //新对象引用
 	if y.left != nil {
 		y.left.parent = x
@@ -76,6 +79,9 @@ func (tree *RBTree) rotateLeft(x *RBTreeNode)  {
 	*/
 // 右旋操作，当前节点成为右节点
 func (tree *RBTree) rotateRight(y *RBTreeNode) () {
+	if y.left==nil{
+		return
+	}
 	x := y.left
 	if y.parent == nil {
 		tree.root = x
