@@ -10,19 +10,19 @@ type RBTreeNode struct {
 	parent, left, right *RBTreeNode
 }
 
-type BRTree struct {
+type RBTree struct {
 	root *RBTreeNode
 	size int
 	lock sync.RWMutex
 }
 
-func NewBRTree() *BRTree {
-	tree := new(BRTree)
+func New() *RBTree {
+	tree := new(RBTree)
 	tree.size = 0
 	return tree
 }
 
-func (tree *BRTree) Add(item Item) {
+func (tree *RBTree) Add(item Item) {
 	//如果没有节点，就把新增的节点设置成跟节点
 	if (*tree).root == nil {
 		(*tree).root = &RBTreeNode{true, item, nil, nil, nil}
@@ -45,14 +45,13 @@ func (tree *BRTree) Add(item Item) {
 	*
 	*
 	*/
-func (x *RBTreeNode) rotateLeft() (*RBTreeNode, error) {
-	var root *RBTreeNode
+func (tree *RBTree) rotateLeft(x *RBTreeNode)  {
 	y := x.right //新对象引用
 	if y.left != nil {
 		y.left.parent = x
 	}
 	if x.parent != nil {
-		root = y
+		tree.root = y
 	} else {
 		y.parent = x.parent
 		x.parent.left = y
@@ -60,8 +59,6 @@ func (x *RBTreeNode) rotateLeft() (*RBTreeNode, error) {
 	y.left = x
 	x.parent = y
 	x.right = y.left
-	return root, nil
-
 }
 
 /*
@@ -78,11 +75,10 @@ func (x *RBTreeNode) rotateLeft() (*RBTreeNode, error) {
 	*
 	*/
 // 右旋操作，当前节点成为右节点
-func (y *RBTreeNode) rotateRight() (*RBTreeNode, error) {
-	var root *RBTreeNode
+func (tree *RBTree) rotateRight(y *RBTreeNode) () {
 	x := y.left
 	if y.parent == nil {
-		root = x
+		tree.root = x
 	} else {
 		x.parent = y.parent
 		y.parent.left = x
@@ -93,8 +89,6 @@ func (y *RBTreeNode) rotateRight() (*RBTreeNode, error) {
 		y.left = x.right
 		x.right.parent = y
 	}
-	return root, nil
-
 }
 
 /*
