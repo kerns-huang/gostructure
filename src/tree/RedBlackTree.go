@@ -97,6 +97,11 @@ func (tree *RBTree) rotateRight(y *RBTreeNode) () {
 	}
 }
 
+func (tree *RBTree) insert(node *RBTreeNode) *RBTreeNode{
+
+	return nil
+}
+
 /*
  * 红黑树插入修正函数
  *
