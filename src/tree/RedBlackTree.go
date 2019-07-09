@@ -12,6 +12,12 @@ type RBTreeNode struct {
 	parent, left, right *RBTreeNode
 }
 
+const (
+	RED bool= true
+
+	BLACK bool= false
+)
+
 type RBTree struct {
 	root *RBTreeNode
 	size int
