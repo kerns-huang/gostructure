@@ -131,14 +131,13 @@ func (tree *RBTree) insert(node *RBTreeNode) *RBTreeNode {
 
 	if node.item.Compare(no2.item) ==1 {
 		no2.right=node
-
 	}else{
 		no2.left=node
 	}
 	node.parent=no2
 	tree.insertFixUp(node) //节点修复
 	tree.size++
-	return nil
+	return node
 }
 
 /*
