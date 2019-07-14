@@ -17,6 +17,7 @@ package tree
  *  extra: linux 内存页大小获取  getconf PAGE_SIZE
  *  如果存储数组的下标基于0，那么下标为i的节点的子节点是2i + 1与2i + 2；其父节点的下标是⌊floor((i − 1) ∕ 2)⌋
  *  函数floor(x)的功能是“向下取整”，或者说“向下舍入”
+ * https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8F%89%E5%A0%86
  */
 
 type MinBinaryHeap struct {
