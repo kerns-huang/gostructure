@@ -20,11 +20,11 @@ package tree
  * https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8F%89%E5%A0%86
  */
 
-type MinBinaryHeap struct {
+type MaxBinaryHeap struct {
 	items []Item
 }
 
-func (heap *MinBinaryHeap) Push(item Item) *MinBinaryHeap{
+func (heap *MaxBinaryHeap) Push(item Item) *MaxBinaryHeap {
 	heap.items = append(heap.items, item)
 	datas:=heap.heapup(heap.items, len(heap.items))
 	heap.items=datas
@@ -32,7 +32,7 @@ func (heap *MinBinaryHeap) Push(item Item) *MinBinaryHeap{
 
 }
 
-func (heap *MinBinaryHeap) Pop() *Item {
+func (heap *MaxBinaryHeap) Pop() *Item {
 	item := heap.items[len(heap.items)-1]
 	heap.items = heap.items[:len(heap.items)-1]
 	return &item
@@ -42,7 +42,7 @@ func (heap *MinBinaryHeap) Pop() *Item {
 /**
  * 上浮调整
  */
-func (heap *MinBinaryHeap) heapup(datas []Item, index int) []Item {
+func (heap *MaxBinaryHeap) heapup(datas []Item, index int) []Item {
 	if index > 1 {
 		parent := index / 2
 		parentValue := datas[parent-1]

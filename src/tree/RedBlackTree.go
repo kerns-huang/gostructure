@@ -6,6 +6,10 @@ type Item interface {
 	Compare(o Item) int
 }
 
+type IntItem struct {
+	value int
+}
+
 type RBTreeNode struct {
 	isRed               bool
 	item                Item
