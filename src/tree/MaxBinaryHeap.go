@@ -42,15 +42,10 @@ func (heap *MaxBinaryHeap) Pop() *Item {
 /**
  * 上浮调整
  */
-<<<<<<< HEAD:src/tree/MaxBinaryHeap.go
-func (heap *MaxBinaryHeap) heapup(datas []Item, index int) []Item {
-	if index > 1 {
-		parent := index / 2
-=======
-func (heap *MinBinaryHeap) heapup(datas []Item, size int) []Item {
+
+func (heap *MaxBinaryHeap) heapup(datas []Item, size int) []Item {
 	if size > 1 {
 		parent := size / 2
->>>>>>> c194b0dffcc67705ab9b9aea452719633bd895b6:src/tree/MinBinaryHeap.go
 		parentValue := datas[parent-1]
 		indexValue := datas[size-1]
 		if parentValue.Compare(indexValue) == -1 {
