@@ -10,7 +10,7 @@ package tree
  *		            /     \      /     \
  *	              5      6     7      8
  *               / \     / \
- *              1   2   3   4
+ *              1   2   3   5
  * 最大二叉堆一般使用数组来存储数据
  *  [11,10,9,8,7,6,5,4,3,2,1] ,
  *  对于一个很大的堆，这种存储是低效的。因为节点的子节点很可能在另外一个内存页
@@ -42,15 +42,21 @@ func (heap *MaxBinaryHeap) Pop() *Item {
 /**
  * 上浮调整
  */
+<<<<<<< HEAD:src/tree/MaxBinaryHeap.go
 func (heap *MaxBinaryHeap) heapup(datas []Item, index int) []Item {
 	if index > 1 {
 		parent := index / 2
+=======
+func (heap *MinBinaryHeap) heapup(datas []Item, size int) []Item {
+	if size > 1 {
+		parent := size / 2
+>>>>>>> c194b0dffcc67705ab9b9aea452719633bd895b6:src/tree/MinBinaryHeap.go
 		parentValue := datas[parent-1]
-		indexValue := datas[index-1]
-		if parentValue.Compare(indexValue) == 1 {
+		indexValue := datas[size-1]
+		if parentValue.Compare(indexValue) == -1 {
 			tmp := datas[parent-1]
-			datas[parent-1] = datas[index-1]
-			datas[index-1] = tmp
+			datas[parent-1] = datas[size-1]
+			datas[size-1] = tmp
 			heap.heapup(datas, parent)
 		} else {
 			//没有发生交换，说明新增的数据已经找到它的位置了
@@ -59,3 +65,5 @@ func (heap *MaxBinaryHeap) heapup(datas []Item, index int) []Item {
 	}
 	return datas
 }
+
+
