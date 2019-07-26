@@ -6,17 +6,17 @@ import (
 )
 
 
-type Node struct {
-	pre  *Node
+type LinkedListNode struct {
+	pre  *LinkedListNode
 	data Item
-	next *Node
+	next *LinkedListNode
 }
 //链表结构
 type LinkedList struct {
 	size  int //链表长度
-	last  *Node
-	first *Node        //跟节点
-	lock  sync.RWMutex //读写锁对象
+	last  *LinkedListNode
+	first *LinkedListNode //跟节点
+	lock  sync.RWMutex    //读写锁对象
 }
 //新生成一个LinkedList
 func NewLinkedList() *LinkedList{
@@ -31,7 +31,7 @@ func (list *LinkedList) Init() {
 }
 //添加链表数据
 func (list *LinkedList) Add(t Item) {
-	node := new(Node{nil, t, nil})
+	node := &LinkedListNode{nil, t, nil}
 	(*list).add(node)
 }
 //判断链表是否为空
@@ -107,17 +107,18 @@ func (list *LinkedList) ToString() {
 	curNode := list.first
 	for {
 		if curNode != nil {
-			println(curNode.data)
+			print(curNode.data,",")
 		}
 		if curNode.next == nil {
 			break
 		}
 		curNode = curNode.next
 	}
+	println()
 }
 
 //内部函数，添加节点数据
-func (list *LinkedList) add(node *Node) {
+func (list *LinkedList) add(node *LinkedListNode) {
 	list.lock.Lock()
 	defer list.lock.Unlock()
 	if (*list).size == 0 {

@@ -3,10 +3,8 @@ package list
 import "testing"
 
 
-
-var list LinkedList
-
 func TestAdd(t *testing.T) {
+	list :=NewLinkedList()
 	if !list.Empty() {
 		t.Errorf("Linked list should be empty")
 	}
@@ -26,7 +24,7 @@ func TestAdd(t *testing.T) {
 
 
 func TestRemoveAt(t *testing.T){
-
+	list :=NewLinkedList()
 	list.RemoveAt(1)
 	if list.size!=2{
 		t.Errorf("can not remove null list")
@@ -34,6 +32,7 @@ func TestRemoveAt(t *testing.T){
 }
 
 func TestContains(t *testing.T){
+	list :=NewLinkedList()
 	result :=list.Contains("1","3")
 	if !result{
 		t.Error("contains method is error")
@@ -41,15 +40,17 @@ func TestContains(t *testing.T){
 }
 
 func TestReverse(t *testing.T){
+	list :=NewLinkedList()
 	list.Add("1")
 	list.Add("2")
 	list.Add("3")
-	println(list.ToString)
+	list.ToString()
 	list.Reverse()
-	println(list.ToString)
+	list.ToString()
 
 }
 
 func TestToString(t *testing.T) {
+	list :=NewLinkedList()
 	list.ToString()
 }
