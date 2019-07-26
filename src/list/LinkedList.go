@@ -87,6 +87,20 @@ func (list *LinkedList) Contains(vals ...Item) bool {
 	}
 	return ss == len(vals)
 }
+//依赖反转
+func (list *LinkedList) Reverse() *LinkedList{
+   node := list.first
+   for node !=nil{
+   	 	temp := node.next
+   	 	node.next=node.pre
+   	 	node.pre=temp
+   	 	node=temp
+   }
+   temp :=list.first
+   list.first=list.last
+   list.last=temp
+   return list
+}
 
 //打印string结构
 func (list *LinkedList) ToString() {

@@ -10,15 +10,15 @@ func TestAdd(t *testing.T) {
 	if !list.Empty() {
 		t.Errorf("Linked list should be empty")
 	}
-	list.Add(1)
+	list.Add("1")
 	if list.Empty() {
 		t.Errorf("Linked list should not be empty")
 	}
 	if size := list.Size(); size != 1 {
 		t.Errorf("Wrong count, expected 1 but got %d", size)
 	}
-	list.Add(2)
-	list.Add(3)
+	list.Add("2")
+	list.Add("3")
 	if size := list.Size(); size != 3 {
 		t.Errorf("Wrong count, expected 3 but got %d", size)
 	}
@@ -34,10 +34,20 @@ func TestRemoveAt(t *testing.T){
 }
 
 func TestContains(t *testing.T){
-	result :=list.Contains(1,3)
+	result :=list.Contains("1","3")
 	if !result{
 		t.Error("contains method is error")
 	}
+}
+
+func TestReverse(t *testing.T){
+	list.Add("1")
+	list.Add("2")
+	list.Add("3")
+	println(list.ToString)
+	list.Reverse()
+	println(list.ToString)
+
 }
 
 func TestToString(t *testing.T) {
