@@ -11,7 +11,7 @@ type Node struct {
 	data Item
 	next *Node
 }
-
+//链表结构
 type LinkedList struct {
 	size  int //链表长度
 	last  *Node
@@ -24,33 +24,32 @@ func NewLinkedList() *LinkedList{
 	list.Init()
 	return list
 }
-
+//初始化链表
 func (list *LinkedList) Init() {
 	(*list).size = 0
 	(list).first = nil
 }
-
+//添加链表数据
 func (list *LinkedList) Add(t Item) {
-	node := &Node{nil, t, nil}
+	node := new(Node{nil, t, nil})
 	(*list).add(node)
 }
-
+//判断链表是否为空
 func (list *LinkedList) Empty() bool {
 	return (*list).size == 0
 }
-
+//查找链表的长度
 func (list *LinkedList) Size() int {
 	return (*list).size
 }
 
-
+//删除链表数据
 func (list *LinkedList) RemoveAt(i int) (*Item, error) {
 	list.lock.Lock()
 	defer list.lock.Unlock()
 	if i < 0 || i > list.size {
 		return nil, fmt.Errorf("Index %d out of bonuds", i)
 	}
-
 	curNode := list.first
 	preIndex := 0
 	for preIndex < i {
@@ -70,7 +69,7 @@ func (list *LinkedList) RemoveAt(i int) (*Item, error) {
 	list.size--
 	return &item, nil
 }
-
+//是否包含该数据
 func (list *LinkedList) Contains(vals ...Item) bool {
 	ss := 0
 	for _, v := range vals {
@@ -89,6 +88,7 @@ func (list *LinkedList) Contains(vals ...Item) bool {
 	return ss == len(vals)
 }
 
+//打印string结构
 func (list *LinkedList) ToString() {
 	curNode := list.first
 	for {
@@ -102,7 +102,7 @@ func (list *LinkedList) ToString() {
 	}
 }
 
-
+//内部函数，添加节点数据
 func (list *LinkedList) add(node *Node) {
 	list.lock.Lock()
 	defer list.lock.Unlock()
