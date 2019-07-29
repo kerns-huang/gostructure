@@ -2,7 +2,6 @@ package tree
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 )
 
@@ -583,9 +582,6 @@ func (t *BPlugTree) findLeaf(key int, verbose bool) *BPlugTreeNode {
 	i := 0
 	c := t.Root
 	if c == nil {  //如果根节点为空，没有叶子节点
-		if verbose {
-			fmt.Printf("Empty tree.\n")
-		}
 		return c
 	}
 	for !c.IsLeaf {//如果c不是叶子节点，查找key索引
