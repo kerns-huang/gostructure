@@ -6,8 +6,8 @@ import (
 )
 
 /**
- * b+ 树
- *一颗m阶的B树定义如下：
+ *  b+ 树
+ * 一颗m阶的B树定义如下：
  * 1）每个结点最多有m-1个关键字。
  * 2）根结点最少可以只有1个关键字。
  * 3）非根结点至少有Math.ceil(m/2)-1个关键字。
@@ -62,9 +62,9 @@ func (t *BPlugTree) Insert(key int, value []byte) error {
 		return t.startNewTree(key, pointer)
 	}
 
-	leaf = t.findLeaf(key, false)
+	leaf = t.findLeaf(key, false) //查找叶子节点，只有叶子节点才存放数据
 
-	if leaf.NumKeys < order-1 {
+	if leaf.NumKeys < order-1 { //叶子节点拥有的节点
 		insertIntoLeaf(leaf, key, pointer)
 		return nil
 	}
