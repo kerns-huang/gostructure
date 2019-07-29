@@ -526,12 +526,13 @@ func makeLeaf() (node *BPlugTreeNode, e error) {
 	return leaf, nil
 }
 
+//创建一个节点数据
 func makeNode() (node *BPlugTreeNode,e error) {
 	new_node :=new(BPlugTreeNode)
 	if new_node == nil {
 		return nil, errors.New("Error: Node creation.")
 	}
-	new_node.Keys = make([]int, order-1)
+	new_node.Keys = make([]int, order-1) //创建的数组不是和深度有关系 ？
 	if new_node.Keys == nil {
 		return nil, errors.New("Error: New node keys array.")
 	}

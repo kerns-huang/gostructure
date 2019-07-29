@@ -88,10 +88,8 @@ func TestInsertSameKeyTwice(t *testing.T) {
 
 func TestInsertSameValueTwice(t *testing.T) {
 	tree := NewBPlugTree()
-
 	key := 1
 	value := []byte("test")
-
 	err := tree.Insert(key, value)
 	if err != nil {
 		t.Errorf("%s", err)
@@ -100,20 +98,16 @@ func TestInsertSameValueTwice(t *testing.T) {
 	if err != nil {
 		t.Errorf("%s", err)
 	}
-
 	r, err := tree.Find(key, false)
 	if err != nil {
 		t.Errorf("%s\n", err)
 	}
-
 	if r == nil {
 		t.Errorf("returned nil \n")
 	}
-
 	if !reflect.DeepEqual(r.Value, value) {
 		t.Errorf("expected %v and got %v \n", value, r.Value)
 	}
-
 	if tree.Root.NumKeys <= 1 {
 		t.Errorf("expected more than 1 key and got %d", tree.Root.NumKeys)
 	}
@@ -122,19 +116,15 @@ func TestInsertSameValueTwice(t *testing.T) {
 
 func TestDeleteNilTree(t *testing.T) {
 	tree := NewBPlugTree()
-
 	key := 1
-
 	err := tree.Delete(key)
 	if err == nil {
 		t.Errorf("expected error and got nil")
 	}
-
 	r, err := tree.Find(key, false)
 	if err == nil {
 		t.Errorf("expected error and got nil")
 	}
-
 	if r != nil {
 		t.Errorf("returned struct after delete \n")
 	}
