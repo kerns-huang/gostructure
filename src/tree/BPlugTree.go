@@ -19,10 +19,10 @@ var (
 	defaultOrder = 4
 	minOrder     = 3
 	maxOrder     = 20
-	order          = defaultOrder
-	queue          *BPlugTreeNode
+	order        = defaultOrder //阶数是m，则除了根之外的每个节点都包含最少 m/2 个元素最多 m 个元素，
+	queue        *BPlugTreeNode
 	verbose_output = false
-	version        = 0.1
+	version      = 0.1
 )
 type BPlugTree struct {
 	Root *BPlugTreeNode
