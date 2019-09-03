@@ -38,7 +38,7 @@ func TestContains(t *testing.T){
 		t.Error("contains method is error")
 	}
 }
-
+//测试转换信息
 func TestReverse(t *testing.T){
 	list :=NewLinkedList()
 	list.Add("1")

@@ -21,5 +21,10 @@ func main() {
 	fmt.Println("**c = ",**c)
 	fmt.Println("***&*&*&*&c = ",***&*&*&*&*&c)
 	fmt.Println("x = ",x)
+
+	// 创建一个map,更像一个字典
+	data :=make(map[string]interface{})
+	data["userId"]=12
+	fmt.Println(data)
 }
 

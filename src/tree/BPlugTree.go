@@ -48,7 +48,7 @@ func NewBPlugTree() *BPlugTree{
 func (t *BPlugTree) Insert(key int, value []byte) error {
 	var pointer *Record
 	var leaf *BPlugTreeNode
-
+	//检查key是否存在
 	if _, err := t.Find(key, false); err == nil {
 		return errors.New("key already exists")
 	}
@@ -72,7 +72,7 @@ func (t *BPlugTree) Insert(key int, value []byte) error {
 	return t.insertIntoLeafAfterSplitting(leaf, key, pointer)
 }
 
-
+//删除key
 func (t *BPlugTree) Delete(key int) error {
 	key_record, err := t.Find(key, false)
 	if err != nil {
@@ -516,7 +516,7 @@ func (t *BPlugTree) startNewTree(key int, pointer *Record) error {
 	t.Root.NumKeys += 1
 	return nil
 }
-
+//构建叶子节点
 func makeLeaf() (node *BPlugTreeNode, e error) {
 	leaf, err := makeNode()
 	if err != nil {
@@ -558,9 +558,10 @@ func makeRecord(value []byte) (*Record, error) {
 	return new_record, nil
 }
 
+//查找数据
 func (t *BPlugTree) Find(key int, verbose bool) (*Record, error) {
 	i := 0
-	c := t.findLeaf(key, verbose)
+	c := t.findLeaf(key, verbose)//从叶子节点开始查找
 	if c == nil {
 		return nil, errors.New("key not found")
 	}
@@ -587,14 +588,14 @@ func (t *BPlugTree) findLeaf(key int, verbose bool) *BPlugTreeNode {
 	}
 	for !c.IsLeaf {//如果c不是叶子节点，查找key索引
 		i = 0
-		for i < c.NumKeys {
-			if key >= c.Keys[i] {
+		for i < c.NumKeys {//拥有的总的key数据
+			if key >= c.Keys[i] { //存在数据里面的key数据
 				i += 1
 			} else {
 				break
 			}
 		}
-		c, _ = c.Pointers[i].(*BPlugTreeNode)  //按照理解，这是一个内部迭代的逻辑，但point值执行子节点or data ？
+		c, _ = c.Pointers[i].(*BPlugTreeNode)  //查找节点信息
 	}
 	return c
 }
