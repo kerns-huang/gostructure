@@ -1,55 +1,47 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"net"
-	"os"
-	"strconv"
-	"sync"
+	"time"
 )
 
-var host = flag.String("host", "localhost", "host")
-var port = flag.String("port", "3333", "port")
+var (
+	ip          = flag.String("ip", "127.0.0.1", "server IP")
+	connections = flag.Int("conn", 1, "number of tcp connections")
+)
 func main() {
 	flag.Parse()
-	conn, err := net.Dial("tcp", *host+":"+*port)
-	if err != nil {
-		fmt.Println("Error connecting:", err)
-		os.Exit(1)
-	}
-	defer conn.Close() //最终close
-	fmt.Println("Connecting to " + *host + ":" + *port)
-	//类似java里面的CountDownLatch,
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go handleWrite(conn, &wg)
-	go handleRead(conn, &wg)
-	wg.Wait()
-}
-//发送消息给服务端
-func handleWrite(conn net.Conn, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for i := 10; i > 0; i-- {
-		//strconv.Itoa(i) 转成string ，这个还是Java相对方便一点
-		_, e := conn.Write([]byte("hello " + strconv.Itoa(i) + "\r\n"))
-		if e != nil {
-			fmt.Println("Error to send message because of ", e.Error())
-			break
-		}
-	}
-}
-//从服务端接受消息
-func handleRead(conn net.Conn, wg *sync.WaitGroup) {
-	defer wg.Done() //最终执行的过程
-	reader := bufio.NewReader(conn)
-	for i := 1; i <= 10; i++ {
-		line, err := reader.ReadString(byte('\n'))
+	addr := *ip + ":8972"
+	log.Printf("连接到 %s", addr)
+	var conns []net.Conn
+	for i := 0; i < *connections; i++ {
+		c, err := net.DialTimeout("tcp", addr, 10*time.Second)
 		if err != nil {
-			fmt.Print("Error to read message because of ", err)
-			return
+			fmt.Println("failed to connect", i, err)
+			i--
+			continue
 		}
-		fmt.Print(line)
+		conns = append(conns, c)
+		time.Sleep(time.Millisecond)
+	}
+	defer func() {
+		for _, c := range conns {
+			c.Close()
+		}
+	}()
+	log.Printf("完成初始化 %d 连接", len(conns))
+	tts := time.Second
+	if *connections > 100 {
+		tts = time.Millisecond * 5
+	}
+	for {
+		for i := 0; i < len(conns); i++ {//循环遍历tcp连接，发送hellow word
+			time.Sleep(tts)
+			conn := conns[i]
+			conn.Write([]byte("hello world\r\n"))
+		}
 	}
 }

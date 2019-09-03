@@ -1,43 +1,46 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"net"
-	"os"
+	"net/http"
 )
 
-var host=flag.String("host", "", "host")
-var port=flag.String("port", "3333", "port")
-
 func main() {
-	flag.Parse()
-	var l net.Listener
-	var err error
-	l, err = net.Listen("tcp", *host+":"+*port)
+	ln, err := net.Listen("tcp", ":8972")
 	if err != nil {
-		fmt.Println("Error listening:", err)
-		os.Exit(1)
+		panic(err)
 	}
-	defer l.Close()
-	fmt.Println("Listening on " + *host + ":" + *port)
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			fmt.Println("Error accepting: ", err)
-			os.Exit(1)
+	go func() {
+		if err := http.ListenAndServe(":6060", nil); err != nil {
+			log.Fatalf("pprof failed: %v", err)
 		}
-		//logs an incoming message
-		fmt.Printf("Received message %s -> %s \n", conn.RemoteAddr(), conn.LocalAddr())
-		// Handle connections in a new goroutine.
-		go handleRequest(conn)
+	}()
+	var connections []net.Conn
+	defer func() {
+		for _, conn := range connections {
+			conn.Close()
+		}
+	}()
+	for {
+		conn, e := ln.Accept()
+		if e != nil {
+			if ne, ok := e.(net.Error); ok && ne.Temporary() {
+				log.Printf("accept temp err: %v", ne)
+				continue
+			}
+			log.Printf("accept err: %v", e)
+			return
+		}
+		go handleConn(conn)
+		connections = append(connections, conn)
+		if len(connections)%100 == 0 {
+			log.Printf("total number of connections: %v", len(connections))
+		}
 	}
 }
-
-func handleRequest(conn net.Conn) {
-	defer conn.Close()
-	for {
-		io.Copy(conn, conn)
-	}
+func handleConn(conn net.Conn) {
+	io.Copy(ioutil.Discard, conn)
 }
