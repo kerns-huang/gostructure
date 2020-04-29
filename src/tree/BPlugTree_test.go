@@ -113,7 +113,6 @@ func TestInsertSameValueTwice(t *testing.T) {
 	}
 }
 
-
 func TestDeleteNilTree(t *testing.T) {
 	tree := NewBPlugTree()
 	key := 1

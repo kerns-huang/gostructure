@@ -31,8 +31,8 @@ type BPlugTree struct {
  	Pointers []interface{}  //指向数据的指针
  	Keys []int //key
  	NumKeys int //拥有多少数据
- 	Parent *BPlugTreeNode //父亲节点
- 	Children []*BPlugTreeNode  // 子节点，但如果是从底部
+ 	Parent *BPlugTreeNode //父亲节点指针
+ 	Children []*BPlugTreeNode  // 子节点指针，但如果是从底部
  	IsLeaf bool  //是否是叶子节点
  	Next *BPlugTreeNode //兄弟节点
  }
