@@ -574,9 +574,7 @@ func (t *BPlugTree) Find(key int) (*Record, error) {
 	if i == c.NumKeys {
 		return nil, errors.New("key not found")
 	}
-
 	r, _ := c.Pointers[i].(*Record)
-
 	return r, nil
 }
 
@@ -603,5 +601,5 @@ func (node *BPlugTreeNode) findIndex(Key int) int {
 			break
 		}
 	}
-	return i;
+	return i
 }
