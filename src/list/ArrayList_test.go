@@ -8,6 +8,8 @@ func TestArrayAdd(t *testing.T){
 	if !list.contains(1){
 		t.Error("wrong add ,list need contain 1")
 	}
+	list.Remove(1)
+
 }
 
 
