@@ -15,76 +15,75 @@ import (
  *  5）所有叶子结点都位于同一层，或者说根结点到每个叶子结点的长度都相同。
  */
 var (
-	err error
-	defaultOrder = 4
-	minOrder     = 3
-	maxOrder     = 20
-	order        = defaultOrder //阶数是m，则除了根之外的每个节点都包含最少 m/2 个元素最多 m 个元素，
-	queue        *BPlugTreeNode
+	err            error
+	defaultOrder   = 4
+	minOrder       = 3
+	maxOrder       = 20
+	order          = defaultOrder //阶数是m，则除了根之外的每个节点都包含最少 m/2 个元素最多 m 个元素，
+	queue          *BPlugTreeNode
 	verbose_output = false
-	version      = 0.1
+	version        = 0.1
 )
+
+//b+树结构
 type BPlugTree struct {
 	Root *BPlugTreeNode
 }
- type BPlugTreeNode struct {
- 	Pointers []interface{}  //指向数据的指针
- 	Keys []int //key
- 	NumKeys int //拥有多少数据
- 	Parent *BPlugTreeNode //父亲节点指针
- 	Children []*BPlugTreeNode  // 子节点指针，但如果是从底部
- 	IsLeaf bool  //是否是叶子节点
- 	Next *BPlugTreeNode //兄弟节点
- }
+
+// 树节点结构
+type BPlugTreeNode struct {
+	Pointers []interface{}    //指向数据的指针
+	Keys     []int            //key
+	NumKeys  int              //拥有多少数据
+	Parent   *BPlugTreeNode   //父亲节点指针
+	Children []*BPlugTreeNode // 子节点指针，但如果是从底部
+	IsLeaf   bool             //是否是叶子节点
+	Next     *BPlugTreeNode   //兄弟节点
+}
 
 type Record struct {
-	Value []byte
+	Value interface{}
 }
 
-func NewBPlugTree() *BPlugTree{
+func NewBPlugTree() *BPlugTree {
 	return &BPlugTree{}
 }
+
 //插入数据
-func (t *BPlugTree) Insert(key int, value []byte) error {
+func (t *BPlugTree) Insert(key int, value interface{}) error {
 	var pointer *Record
 	var leaf *BPlugTreeNode
 	//检查key是否存在
-	if _, err := t.Find(key, false); err == nil {
+	if _, err := t.Find(key); err == nil {
 		return errors.New("key already exists")
 	}
-
 	pointer, err := makeRecord(value)
 	if err != nil {
 		return err
 	}
-
 	if t.Root == nil { //没有数据的情况下，构建树接口
 		return t.startNewTree(key, pointer)
 	}
-
-	leaf = t.findLeaf(key, false) //查找叶子节点，只有叶子节点才存放数据
-
+	leaf = t.findLeaf(key)      //查找叶子节点，只有叶子节点才存放数据
 	if leaf.NumKeys < order-1 { //叶子节点拥有的节点
 		insertIntoLeaf(leaf, key, pointer)
 		return nil
 	}
-
 	return t.insertIntoLeafAfterSplitting(leaf, key, pointer)
 }
 
 //删除key
 func (t *BPlugTree) Delete(key int) error {
-	key_record, err := t.Find(key, false)
+	key_record, err := t.Find(key)
 	if err != nil {
 		return err
 	}
-	key_leaf := t.findLeaf(key, false)
+	key_leaf := t.findLeaf(key)
 	if key_record != nil && key_leaf != nil {
 		t.deleteEntry(key_leaf, key, key_record)
 	}
 	return nil
 }
-
 
 func (t *BPlugTree) deleteEntry(n *BPlugTreeNode, key int, pointer interface{}) {
 	var min_keys, neighbour_index, k_prime_index, k_prime, capacity int
@@ -298,6 +297,7 @@ func cut(length int) int {
 
 	return length/2 + 1
 }
+
 // 插入数据到叶子节点
 func insertIntoLeaf(leaf *BPlugTreeNode, key int, pointer *Record) {
 	var i, insertion_point int
@@ -409,7 +409,6 @@ func getLeftIndex(parent, left *BPlugTreeNode) int {
 	return left_index
 }
 
-
 func insertIntoNode(n *BPlugTreeNode, left_index, key int, right *BPlugTreeNode) {
 	var i int
 	for i = n.NumKeys; i > left_index; i-- {
@@ -503,6 +502,7 @@ func (t *BPlugTree) insertIntoParent(left *BPlugTreeNode, key int, right *BPlugT
 	}
 	return t.insertIntoNodeAfterSplitting(parent, left_index, key, right)
 }
+
 //构建新的树
 func (t *BPlugTree) startNewTree(key int, pointer *Record) error {
 	t.Root, err = makeLeaf()
@@ -516,6 +516,7 @@ func (t *BPlugTree) startNewTree(key int, pointer *Record) error {
 	t.Root.NumKeys += 1
 	return nil
 }
+
 //构建叶子节点
 func makeLeaf() (node *BPlugTreeNode, e error) {
 	leaf, err := makeNode()
@@ -527,8 +528,8 @@ func makeLeaf() (node *BPlugTreeNode, e error) {
 }
 
 //创建一个节点数据
-func makeNode() (node *BPlugTreeNode,e error) {
-	new_node :=new(BPlugTreeNode)
+func makeNode() (node *BPlugTreeNode, e error) {
+	new_node := new(BPlugTreeNode)
 	if new_node == nil {
 		return nil, errors.New("Error: Node creation.")
 	}
@@ -548,7 +549,7 @@ func makeNode() (node *BPlugTreeNode,e error) {
 }
 
 //创建值对象
-func makeRecord(value []byte) (*Record, error) {
+func makeRecord(value interface{}) (*Record, error) {
 	new_record := new(Record)
 	if new_record == nil {
 		return nil, errors.New("Error: Record creation.")
@@ -559,9 +560,9 @@ func makeRecord(value []byte) (*Record, error) {
 }
 
 //查找数据
-func (t *BPlugTree) Find(key int, verbose bool) (*Record, error) {
+func (t *BPlugTree) Find(key int) (*Record, error) {
 	i := 0
-	c := t.findLeaf(key, verbose)//从叶子节点开始查找
+	c := t.findLeaf(key) //从叶子节点开始查找
 	if c == nil {
 		return nil, errors.New("key not found")
 	}
@@ -580,22 +581,27 @@ func (t *BPlugTree) Find(key int, verbose bool) (*Record, error) {
 }
 
 //查找叶子节点
-func (t *BPlugTree) findLeaf(key int, verbose bool) *BPlugTreeNode {
+func (t *BPlugTree) findLeaf(key int) *BPlugTreeNode {
 	i := 0
-	c := t.Root
-	if c == nil {  //如果根节点为空，没有叶子节点
-		return c
+	node := t.Root
+	if node == nil { //如果根节点为空，没有叶子节点
+		return node
 	}
-	for !c.IsLeaf {//如果c不是叶子节点，查找key索引
-		i = 0
-		for i < c.NumKeys {//拥有的总的key数据
-			if key >= c.Keys[i] { //存在数据里面的key数据
-				i += 1
-			} else {
-				break
-			}
+	for !node.IsLeaf { //如果c不是叶子节点，查找key索引
+		i = node.findIndex(key)
+		node, _ = node.Pointers[i].(*BPlugTreeNode) //查找节点信息
+	}
+	return node
+}
+
+func (node *BPlugTreeNode) findIndex(Key int) int {
+	i := 0
+	for i < node.NumKeys {
+		if Key >= node.Keys[i] {
+			i++
+		} else {
+			break
 		}
-		c, _ = c.Pointers[i].(*BPlugTreeNode)  //查找节点信息
 	}
-	return c
+	return i;
 }
