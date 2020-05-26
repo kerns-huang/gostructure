@@ -41,7 +41,7 @@ func (list *ArrayList) IsEmpty() bool {
 }
 
 //是否包含其实是一个查找函数，其实可以通过二分查找去实现数据的查找
-func (list *ArrayList) contains(obj interface{}) bool {
+func (list *ArrayList) Contains(obj interface{}) bool {
 	if list.searchIndex(obj) > 0 {
 		return true
 	}
