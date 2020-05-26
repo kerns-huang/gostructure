@@ -7,12 +7,7 @@ import (
 
 /**
  *  b+ 树
- * 一颗m阶的B树定义如下：
- * 1）每个结点最多有m-1个关键字。
- * 2）根结点最少可以只有1个关键字。
- * 3）非根结点至少有Math.ceil(m/2)-1个关键字。
- * 4）每个结点中的关键字都按照从小到大的顺序排列，每个关键字的左子树中的所有关键字都小于它，而右子树中的所有关键字都大于它。
- *  5）所有叶子结点都位于同一层，或者说根结点到每个叶子结点的长度都相同。
+ *  https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html
  */
 var (
 	err            error
@@ -41,6 +36,7 @@ type BPlugTreeNode struct {
 	Next     *BPlugTreeNode   //兄弟节点
 }
 
+// 保存的数据
 type Record struct {
 	Value interface{}
 }
@@ -57,7 +53,7 @@ func (t *BPlugTree) Insert(key int, value interface{}) error {
 	if _, err := t.Find(key); err == nil {
 		return errors.New("key already exists")
 	}
-	pointer, err := makeRecord(value)
+	pointer, err := makeRecord(value)//生成一条新数据
 	if err != nil {
 		return err
 	}
@@ -587,12 +583,12 @@ func (t *BPlugTree) findLeaf(key int) *BPlugTreeNode {
 }
 
 func (node *BPlugTreeNode) findIndex(Key int) int {
-	 low := 0
-	 high := node.NumKeys - 1
+	low := 0
+	high := node.NumKeys - 1
 	// the cached index minus one, so that
 	// for the first time (when cachedCompare is 0),
 	// the default value is used
-	 x := 0
+	x := 0
 	if x < 0 || x > high {
 		x = high >> 1
 	}
