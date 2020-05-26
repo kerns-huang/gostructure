@@ -13,15 +13,18 @@ func (list *ArrayList) Add(obj interface{}) ()  {
 //删除元素
 func (list *ArrayList) Remove(obj interface{}) {
 
-
 }
-
 //是否为空
 func (list *ArrayList) IsEmpty() bool{
 	return len(list.elementData)==0
 }
-//是否包含
+//是否包含其实是一个查找函数，其实可以通过二分查找去实现数据的查找
 func(list *ArrayList) contains(obj interface{}) bool{
-	return len(list.elementData)==0
+	for i:=0; i<len(list.elementData);i++{
+		if list.elementData[i] == obj{
+			return true
+		}
+	}
+	return false
 }
 
