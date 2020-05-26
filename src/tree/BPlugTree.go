@@ -32,7 +32,7 @@ type BPlugTree struct {
 
 // 树节点结构
 type BPlugTreeNode struct {
-	Pointers []interface{}    //指向数据的指针
+	Pointers []interface{}    //存储的数据
 	Keys     []int            //key
 	NumKeys  int              //拥有多少数据
 	Parent   *BPlugTreeNode   //父亲节点指针
@@ -317,7 +317,7 @@ func insertIntoLeaf(leaf *BPlugTreeNode, key int, pointer *Record) {
 }
 
 func (t *BPlugTree) insertIntoLeafAfterSplitting(leaf *BPlugTreeNode, key int, pointer *Record) error {
-	var new_leaf *BPlugTreeNode
+	var new_leaf *BPlugTreeNode //新的叶子节点
 	var insertion_index, split, new_key, i, j int
 	var err error
 
@@ -326,7 +326,7 @@ func (t *BPlugTree) insertIntoLeafAfterSplitting(leaf *BPlugTreeNode, key int, p
 		return nil
 	}
 
-	temp_keys := make([]int, order)
+	temp_keys := make([]int, order) //定义切片
 	if temp_keys == nil {
 		return errors.New("Error: Temporary keys array.")
 	}
@@ -533,14 +533,8 @@ func makeNode() (node *BPlugTreeNode, e error) {
 	if new_node == nil {
 		return nil, errors.New("Error: Node creation.")
 	}
-	new_node.Keys = make([]int, order-1) //创建的数组不是和深度有关系 ？
-	if new_node.Keys == nil {
-		return nil, errors.New("Error: New node keys array.")
-	}
+	new_node.Keys = make([]int, order) //创建的数组不是和深度有关系 ？
 	new_node.Pointers = make([]interface{}, order)
-	if new_node.Keys == nil {
-		return nil, errors.New("Error: New node pointers array.")
-	}
 	new_node.IsLeaf = false
 	new_node.NumKeys = 0
 	new_node.Parent = nil
@@ -593,13 +587,24 @@ func (t *BPlugTree) findLeaf(key int) *BPlugTreeNode {
 }
 
 func (node *BPlugTreeNode) findIndex(Key int) int {
-	i := 0
-	for i < node.NumKeys {
-		if Key >= node.Keys[i] {
-			i++
-		} else {
-			break
-		}
+	 low := 0
+	 high := node.NumKeys - 1
+	// the cached index minus one, so that
+	// for the first time (when cachedCompare is 0),
+	// the default value is used
+	 x := 0
+	if x < 0 || x > high {
+		x = high >> 1
 	}
-	return i
+	for low <= high {
+		if Key > node.Keys[x] {
+			low = x + 1
+		} else if Key < node.Keys[x] {
+			high = x - 1
+		} else {
+			return x
+		}
+		x = (low + high) >> 1
+	}
+	return -1
 }

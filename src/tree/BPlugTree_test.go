@@ -167,10 +167,8 @@ func TestDeleteNotFound(t *testing.T) {
 
 func TestMultiInsertSingleDelete(t *testing.T) {
 	tree := NewBPlugTree()
-
 	key := 1
 	value := []byte("test")
-
 	err := tree.Insert(key, value)
 	if err != nil {
 		t.Errorf("%s", err)
