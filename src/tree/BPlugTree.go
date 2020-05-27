@@ -291,7 +291,7 @@ func cut(length int) int {
 		return length / 2
 	}
 
-	return length/2 + 1
+	return length >>1 + 1
 }
 
 // 插入数据到叶子节点
