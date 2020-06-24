@@ -6,7 +6,7 @@ import (
 )
 
 /**
- *  b+ 树
+ *  b+ 树 ,一般树主要用在数据库索引这一块/
  *  https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html
  */
 var (
@@ -14,7 +14,7 @@ var (
 	defaultOrder   = 4
 	minOrder       = 3
 	maxOrder       = 20
-	order          = defaultOrder //阶数是m，则除了根之外的每个节点都包含最少 m/2 个元素最多 m 个元素，
+	order          = defaultOrder //阶数是m，则除了根之外的每个节点都包含最少 1 个元素最多 m 个元素，
 	queue          *BPlugTreeNode
 	verbose_output = false
 	version        = 0.1
@@ -27,7 +27,7 @@ type BPlugTree struct {
 
 // 树节点结构
 type BPlugTreeNode struct {
-	Pointers []interface{}    //存储的数据
+	Records  []interface{}    //存储的数据
 	Keys     []int            //key
 	NumKeys  int              //拥有多少数据
 	Parent   *BPlugTreeNode   //父亲节点指针
@@ -35,7 +35,6 @@ type BPlugTreeNode struct {
 	IsLeaf   bool             //是否是叶子节点
 	Next     *BPlugTreeNode   //兄弟节点
 }
-
 // 保存的数据
 type Record struct {
 	Value interface{}
@@ -53,7 +52,7 @@ func (t *BPlugTree) Insert(key int, value interface{}) error {
 	if _, err := t.Find(key); err == nil {
 		return errors.New("key already exists")
 	}
-	pointer, err := makeRecord(value)//生成一条新数据
+	pointer, err := makeRecord(value) //生成一条新数据
 	if err != nil {
 		return err
 	}
@@ -61,7 +60,7 @@ func (t *BPlugTree) Insert(key int, value interface{}) error {
 		return t.startNewTree(key, pointer)
 	}
 	leaf = t.findLeaf(key)      //查找叶子节点，只有叶子节点才存放数据
-	if leaf.NumKeys < order-1 { //叶子节点拥有的节点
+	if leaf.NumKeys < order-1 { //叶子节点拥有的节点 TODO 修改和分裂分为两个步骤
 		insertIntoLeaf(leaf, key, pointer)
 		return nil
 	}
@@ -105,9 +104,9 @@ func (t *BPlugTree) deleteEntry(n *BPlugTreeNode, key int, pointer interface{}) 
 	}
 	k_prime = n.Parent.Keys[k_prime_index]
 	if neighbour_index == -1 {
-		neighbour, _ = n.Parent.Pointers[1].(*BPlugTreeNode)
+		neighbour, _ = n.Parent.Records[1].(*BPlugTreeNode)
 	} else {
-		neighbour, _ = n.Parent.Pointers[neighbour_index].(*BPlugTreeNode)
+		neighbour, _ = n.Parent.Records[neighbour_index].(*BPlugTreeNode)
 	}
 
 	if n.IsLeaf {
@@ -132,43 +131,43 @@ func (t *BPlugTree) redistributeNodes(n, neighbour *BPlugTreeNode, neighbour_ind
 
 	if neighbour_index != -1 {
 		if !n.IsLeaf {
-			n.Pointers[n.NumKeys+1] = n.Pointers[n.NumKeys]
+			n.Records[n.NumKeys+1] = n.Records[n.NumKeys]
 		}
 		for i = n.NumKeys; i > 0; i-- {
 			n.Keys[i] = n.Keys[i-1]
-			n.Pointers[i] = n.Pointers[i-1]
+			n.Records[i] = n.Records[i-1]
 		}
 		if !n.IsLeaf { // why the second if !n.IsLeaf
-			n.Pointers[0] = neighbour.Pointers[neighbour.NumKeys]
-			tmp, _ = n.Pointers[0].(*BPlugTreeNode)
+			n.Records[0] = neighbour.Records[neighbour.NumKeys]
+			tmp, _ = n.Records[0].(*BPlugTreeNode)
 			tmp.Parent = n
-			neighbour.Pointers[neighbour.NumKeys] = nil
+			neighbour.Records[neighbour.NumKeys] = nil
 			n.Keys[0] = k_prime
 			n.Parent.Keys[k_prime_index] = neighbour.Keys[neighbour.NumKeys-1]
 		} else {
-			n.Pointers[0] = neighbour.Pointers[neighbour.NumKeys-1]
-			neighbour.Pointers[neighbour.NumKeys-1] = nil
+			n.Records[0] = neighbour.Records[neighbour.NumKeys-1]
+			neighbour.Records[neighbour.NumKeys-1] = nil
 			n.Keys[0] = neighbour.Keys[neighbour.NumKeys-1]
 			n.Parent.Keys[k_prime_index] = n.Keys[0]
 		}
 	} else {
 		if n.IsLeaf {
 			n.Keys[n.NumKeys] = neighbour.Keys[0]
-			n.Pointers[n.NumKeys] = neighbour.Pointers[0]
+			n.Records[n.NumKeys] = neighbour.Records[0]
 			n.Parent.Keys[k_prime_index] = neighbour.Keys[1]
 		} else {
 			n.Keys[n.NumKeys] = k_prime
-			n.Pointers[n.NumKeys+1] = neighbour.Pointers[0]
-			tmp, _ = n.Pointers[n.NumKeys+1].(*BPlugTreeNode)
+			n.Records[n.NumKeys+1] = neighbour.Records[0]
+			tmp, _ = n.Records[n.NumKeys+1].(*BPlugTreeNode)
 			tmp.Parent = n
 			n.Parent.Keys[k_prime_index] = neighbour.Keys[0]
 		}
 		for i = 0; i < neighbour.NumKeys-1; i++ {
 			neighbour.Keys[i] = neighbour.Keys[i+1]
-			neighbour.Pointers[i] = neighbour.Pointers[i+1]
+			neighbour.Records[i] = neighbour.Records[i+1]
 		}
 		if !n.IsLeaf {
-			neighbour.Pointers[i] = neighbour.Pointers[i+1]
+			neighbour.Records[i] = neighbour.Records[i+1]
 		}
 	}
 	n.NumKeys += 1
@@ -195,25 +194,25 @@ func (t *BPlugTree) coalesceNodes(n, neighbour *BPlugTreeNode, neighbour_index, 
 		i = neighbour_insertion_index + 1
 		for j = 0; j < n_end; j++ {
 			neighbour.Keys[i] = n.Keys[j]
-			neighbour.Pointers[i] = n.Pointers[j]
+			neighbour.Records[i] = n.Records[j]
 			neighbour.NumKeys += 1
 			n.NumKeys -= 1
 			i += 1
 		}
-		neighbour.Pointers[i] = n.Pointers[j]
+		neighbour.Records[i] = n.Records[j]
 
 		for i = 0; i < neighbour.NumKeys+1; i++ {
-			tmp, _ = neighbour.Pointers[i].(*BPlugTreeNode)
+			tmp, _ = neighbour.Records[i].(*BPlugTreeNode)
 			tmp.Parent = neighbour
 		}
 	} else {
 		i = neighbour_insertion_index
 		for j = 0; j < n.NumKeys; j++ {
 			neighbour.Keys[i] = n.Keys[j]
-			n.Pointers[i] = n.Pointers[j]
+			n.Records[i] = n.Records[j]
 			neighbour.NumKeys += 1
 		}
-		neighbour.Pointers[order-1] = n.Pointers[order-1]
+		neighbour.Records[order-1] = n.Records[order-1]
 	}
 
 	t.deleteEntry(n.Parent, k_prime, n)
@@ -222,7 +221,7 @@ func getNeighbourIndex(n *BPlugTreeNode) int {
 	var i int
 
 	for i = 0; i <= n.Parent.NumKeys; i++ {
-		if reflect.DeepEqual(n.Parent.Pointers[i], n) {
+		if reflect.DeepEqual(n.Parent.Records[i], n) {
 			return i - 1
 		}
 	}
@@ -237,7 +236,7 @@ func (t *BPlugTree) adjustRoot() {
 	}
 
 	if !t.Root.IsLeaf {
-		new_root, _ = t.Root.Pointers[0].(*BPlugTreeNode)
+		new_root, _ = t.Root.Records[0].(*BPlugTreeNode)
 		new_root.Parent = nil
 	} else {
 		new_root = nil
@@ -265,21 +264,21 @@ func removeEntryFromNode(n *BPlugTreeNode, key int, pointer interface{}) *BPlugT
 	}
 
 	i = 0
-	for n.Pointers[i] != pointer {
+	for n.Records[i] != pointer {
 		i += 1
 	}
 	for i += 1; i < num_pointers; i++ {
-		n.Pointers[i-1] = n.Pointers[i]
+		n.Records[i-1] = n.Records[i]
 	}
 	n.NumKeys -= 1
 
 	if n.IsLeaf {
 		for i = n.NumKeys; i < order-1; i++ {
-			n.Pointers[i] = nil
+			n.Records[i] = nil
 		}
 	} else {
 		for i = n.NumKeys + 1; i < order; i++ {
-			n.Pointers[i] = nil
+			n.Records[i] = nil
 		}
 	}
 
@@ -291,7 +290,7 @@ func cut(length int) int {
 		return length / 2
 	}
 
-	return length >>1 + 1
+	return length>>1 + 1
 }
 
 // 插入数据到叶子节点
@@ -304,10 +303,10 @@ func insertIntoLeaf(leaf *BPlugTreeNode, key int, pointer *Record) {
 
 	for i = leaf.NumKeys; i > insertion_point; i-- {
 		leaf.Keys[i] = leaf.Keys[i-1]
-		leaf.Pointers[i] = leaf.Pointers[i-1]
+		leaf.Records[i] = leaf.Records[i-1]
 	}
 	leaf.Keys[insertion_point] = key
-	leaf.Pointers[insertion_point] = pointer
+	leaf.Records[insertion_point] = pointer
 	leaf.NumKeys += 1
 	return
 }
@@ -341,7 +340,7 @@ func (t *BPlugTree) insertIntoLeafAfterSplitting(leaf *BPlugTreeNode, key int, p
 			j += 1
 		}
 		temp_keys[j] = leaf.Keys[i]
-		temp_pointers[j] = leaf.Pointers[i]
+		temp_pointers[j] = leaf.Records[i]
 		j += 1
 	}
 
@@ -353,27 +352,27 @@ func (t *BPlugTree) insertIntoLeafAfterSplitting(leaf *BPlugTreeNode, key int, p
 	split = cut(order - 1)
 
 	for i = 0; i < split; i++ {
-		leaf.Pointers[i] = temp_pointers[i]
+		leaf.Records[i] = temp_pointers[i]
 		leaf.Keys[i] = temp_keys[i]
 		leaf.NumKeys += 1
 	}
 
 	j = 0
 	for i = split; i < order; i++ {
-		new_leaf.Pointers[j] = temp_pointers[i]
+		new_leaf.Records[j] = temp_pointers[i]
 		new_leaf.Keys[j] = temp_keys[i]
 		new_leaf.NumKeys += 1
 		j += 1
 	}
 
-	new_leaf.Pointers[order-1] = leaf.Pointers[order-1]
-	leaf.Pointers[order-1] = new_leaf
+	new_leaf.Records[order-1] = leaf.Records[order-1]
+	leaf.Records[order-1] = new_leaf
 
 	for i = leaf.NumKeys; i < order-1; i++ {
-		leaf.Pointers[i] = nil
+		leaf.Records[i] = nil
 	}
 	for i = new_leaf.NumKeys; i < order-1; i++ {
-		new_leaf.Pointers[i] = nil
+		new_leaf.Records[i] = nil
 	}
 
 	new_leaf.Parent = leaf.Parent
@@ -388,8 +387,8 @@ func (t *BPlugTree) insertIntoNewRoot(left *BPlugTreeNode, key int, right *BPlug
 		return err
 	}
 	t.Root.Keys[0] = key
-	t.Root.Pointers[0] = left
-	t.Root.Pointers[1] = right
+	t.Root.Records[0] = left
+	t.Root.Records[1] = right
 	t.Root.NumKeys += 1
 	t.Root.Parent = nil
 	left.Parent = t.Root
@@ -399,7 +398,7 @@ func (t *BPlugTree) insertIntoNewRoot(left *BPlugTreeNode, key int, right *BPlug
 
 func getLeftIndex(parent, left *BPlugTreeNode) int {
 	left_index := 0
-	for left_index <= parent.NumKeys && parent.Pointers[left_index] != left {
+	for left_index <= parent.NumKeys && parent.Records[left_index] != left {
 		left_index += 1
 	}
 	return left_index
@@ -408,10 +407,10 @@ func getLeftIndex(parent, left *BPlugTreeNode) int {
 func insertIntoNode(n *BPlugTreeNode, left_index, key int, right *BPlugTreeNode) {
 	var i int
 	for i = n.NumKeys; i > left_index; i-- {
-		n.Pointers[i+1] = n.Pointers[i]
+		n.Records[i+1] = n.Records[i]
 		n.Keys[i] = n.Keys[i-1]
 	}
-	n.Pointers[left_index+1] = right
+	n.Records[left_index+1] = right
 	n.Keys[left_index] = key
 	n.NumKeys += 1
 }
@@ -438,7 +437,7 @@ func (t *BPlugTree) insertIntoNodeAfterSplitting(old_node *BPlugTreeNode, left_i
 		if j == left_index+1 {
 			j += 1
 		}
-		temp_pointers[j] = old_node.Pointers[i]
+		temp_pointers[j] = old_node.Records[i]
 		j += 1
 	}
 
@@ -461,23 +460,23 @@ func (t *BPlugTree) insertIntoNodeAfterSplitting(old_node *BPlugTreeNode, left_i
 	}
 	old_node.NumKeys = 0
 	for i = 0; i < split-1; i++ {
-		old_node.Pointers[i] = temp_pointers[i]
+		old_node.Records[i] = temp_pointers[i]
 		old_node.Keys[i] = temp_keys[i]
 		old_node.NumKeys += 1
 	}
-	old_node.Pointers[i] = temp_pointers[i]
+	old_node.Records[i] = temp_pointers[i]
 	k_prime = temp_keys[split-1]
 	j = 0
 	for i += 1; i < order; i++ {
-		new_node.Pointers[j] = temp_pointers[i]
+		new_node.Records[j] = temp_pointers[i]
 		new_node.Keys[j] = temp_keys[i]
 		new_node.NumKeys += 1
 		j += 1
 	}
-	new_node.Pointers[j] = temp_pointers[i]
+	new_node.Records[j] = temp_pointers[i]
 	new_node.Parent = old_node.Parent
 	for i = 0; i <= new_node.NumKeys; i++ {
-		child, _ = new_node.Pointers[i].(*BPlugTreeNode)
+		child, _ = new_node.Records[i].(*BPlugTreeNode)
 		child.Parent = new_node
 	}
 
@@ -487,7 +486,6 @@ func (t *BPlugTree) insertIntoNodeAfterSplitting(old_node *BPlugTreeNode, left_i
 func (t *BPlugTree) insertIntoParent(left *BPlugTreeNode, key int, right *BPlugTreeNode) error {
 	var left_index int
 	parent := left.Parent
-
 	if parent == nil {
 		return t.insertIntoNewRoot(left, key, right)
 	}
@@ -499,17 +497,16 @@ func (t *BPlugTree) insertIntoParent(left *BPlugTreeNode, key int, right *BPlugT
 	return t.insertIntoNodeAfterSplitting(parent, left_index, key, right)
 }
 
-//构建新的树
-func (t *BPlugTree) startNewTree(key int, pointer *Record) error {
+//添加第一个节点数据
+func (t *BPlugTree) startNewTree(key int, record *Record) error {
+	//初始化一个默认叶子节点
 	t.Root, err = makeLeaf()
 	if err != nil {
 		return err
 	}
 	t.Root.Keys[0] = key
-	t.Root.Pointers[0] = pointer
-	t.Root.Pointers[order-1] = nil
-	t.Root.Parent = nil
-	t.Root.NumKeys += 1
+	t.Root.Records[0] = record
+	t.Root.NumKeys++
 	return nil
 }
 
@@ -523,14 +520,14 @@ func makeLeaf() (node *BPlugTreeNode, e error) {
 	return leaf, nil
 }
 
-//创建一个节点数据
+//创建一个索引节点
 func makeNode() (node *BPlugTreeNode, e error) {
 	new_node := new(BPlugTreeNode)
 	if new_node == nil {
 		return nil, errors.New("Error: Node creation.")
 	}
-	new_node.Keys = make([]int, order) //创建的数组不是和深度有关系 ？
-	new_node.Pointers = make([]interface{}, order)
+	new_node.Keys = make([]int, order)            //创建的数组不是和深度有关系 ？
+	new_node.Records = make([]interface{}, order) //创建切片数据
 	new_node.IsLeaf = false
 	new_node.NumKeys = 0
 	new_node.Parent = nil
@@ -549,10 +546,10 @@ func makeRecord(value interface{}) (*Record, error) {
 	return new_record, nil
 }
 
-//查找数据
+//查找数据,返回record or 错误接口
 func (t *BPlugTree) Find(key int) (*Record, error) {
 	i := 0
-	c := t.findLeaf(key) //从叶子节点开始查找
+	c := t.findLeaf(key) //查找key所在的叶子节点
 	if c == nil {
 		return nil, errors.New("key not found")
 	}
@@ -564,7 +561,7 @@ func (t *BPlugTree) Find(key int) (*Record, error) {
 	if i == c.NumKeys {
 		return nil, errors.New("key not found")
 	}
-	r, _ := c.Pointers[i].(*Record)
+	r, _ := c.Records[i].(*Record)
 	return r, nil
 }
 
@@ -575,13 +572,13 @@ func (t *BPlugTree) findLeaf(key int) *BPlugTreeNode {
 	if node == nil { //如果根节点为空，没有叶子节点
 		return node
 	}
-	for !node.IsLeaf { //如果c不是叶子节点，查找key索引
+	for !node.IsLeaf { //类似java中的while循环，如果c不是叶子节点，查找key索引
 		i = node.findIndex(key)
-		node, _ = node.Pointers[i].(*BPlugTreeNode) //查找节点信息
+		node, _ = node.Records[i].(*BPlugTreeNode) //查找节点信息
 	}
 	return node
 }
-
+// 查找key在节点中的位置
 func (node *BPlugTreeNode) findIndex(Key int) int {
 	low := 0
 	high := node.NumKeys - 1

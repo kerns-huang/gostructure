@@ -164,7 +164,7 @@ func TestDeleteNotFound(t *testing.T) {
 		t.Errorf("expected error and got nil")
 	}
 }
-
+/**测试批量插入和批量删除 */
 func TestMultiInsertSingleDelete(t *testing.T) {
 	tree := NewBPlugTree()
 	key := 1
