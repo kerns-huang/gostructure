@@ -12,6 +12,6 @@ type lsmDb struct {
 	path string
 	curr *DataFile  // 当前文件地址
 	datafiles map[int]DataFile	// 历史的写入文件地址
-					// 树结构，保存索引路径
+					            // 树结构，保存索引路径
 
 }
