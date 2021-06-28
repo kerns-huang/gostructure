@@ -22,8 +22,13 @@ func createTrieNode() *trieNode  {
       node:=&trieNode{count: 0}
       return node
 }
+// 新创建一个字典树
+func NewTrieTree() *TrieTree{
+	return &TrieTree{root: createTrieNode()}
+}
 // 插入数据
 func(tree *TrieTree) Insert(key string)  {
+	//按照字典树规则插入节点
 
 }
 
