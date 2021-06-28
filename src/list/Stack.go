@@ -1,5 +1,8 @@
 package list
 
+/**
+ * 栈逻辑，支持先进先出的逻辑
+ */
 import (
 	"errors"
 )
@@ -30,11 +33,11 @@ func (stack Stack) top() (interface{}, error) {
 }
 
 func (stack *Stack) pop() (interface{}, error) {
-	theStack :=*stack
+	theStack := *stack
 	if stack.Empty() {
 		return nil, errors.New("stack is empty,len is 0")
 	}
-	item := theStack[len(theStack)-1]  //返回最后一个数组
-	*stack = theStack[0:len(theStack)-1] //重新生成切片
-	return item,nil
+	item := theStack[len(theStack)-1]      //返回最后一个数组
+	*stack = theStack[0 : len(theStack)-1] //重新生成切片
+	return item, nil
 }
