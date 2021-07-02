@@ -23,6 +23,7 @@ func init(){
 	GAcAuto = new(AcAutoNode)
 }
 
+// 添加配置
 func BuildTree(s []string) {
 	// 遍历模式串列表
 	for uli := 0; uli < len(s); uli++ {
