@@ -32,12 +32,13 @@ func BuildTree(s []string) {
 			// 分高低位判断
 			runeStr := string(runeCh)
 			for ulj := 0; ulj < len(runeStr); ulj++ {
+				// 取 整
 				indexHigh := runeStr[ulj] / childNodeCount
 				if node.childNode[indexHigh] == nil {
 					node.childNode[indexHigh] = &AcAutoNode{}
 				}
 				node = node.childNode[indexHigh]
-
+				// 取 余
 				indexLow := runeStr[ulj] % childNodeCount
 				if node.childNode[indexLow] == nil {
 					node.childNode[indexLow] = &AcAutoNode{}
