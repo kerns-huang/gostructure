@@ -55,7 +55,7 @@ func BuildTree(s []string) {
 //设置查询失败的指向节点
 func SetNodeFailPoint() {
 	GAcAuto.failNode = nil
-
+    //初始化一个链表
 	nodeList := list.New()
 	nodeList.PushBack(GAcAuto)
 
