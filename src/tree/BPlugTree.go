@@ -8,6 +8,8 @@ import (
 /**
  *  b+ 树 ,一般树主要用在数据库索引这一块/
  *  https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html
+ *  适合多读少写的场景，原因 随机io操作太多，自平衡太多，导致写的效率不高，
+ *  多写少读的场景建议使用 LSM 算法
  */
 var (
 	err            error
