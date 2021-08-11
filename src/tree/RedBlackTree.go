@@ -2,9 +2,11 @@ package tree
 
 import "sync"
 
+//Item 保存的数据
 type Item interface {
 	Compare(o Item) int
 }
+
 
 type IntItem struct {
 	value int
@@ -28,7 +30,7 @@ type RBTree struct {
 	lock sync.RWMutex
 }
 
-func New() *RBTree {
+func NewRBTree() *RBTree {
 	tree := new(RBTree)
 	tree.size = 0
 	return tree

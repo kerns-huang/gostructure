@@ -9,9 +9,8 @@ import "sync"
 
 type lsmDb struct {
 	lock sync.RWMutex //读写锁
-	path string
+	path string   // 文件路径
 	curr *DataFile  // 当前文件地址
 	datafiles map[int]DataFile	// 历史的写入文件地址
 					            // 树结构，保存索引路径
-
 }
